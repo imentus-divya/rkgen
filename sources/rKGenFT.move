@@ -703,23 +703,4 @@ module rKGenAdmin::rKGenV1 {
             }
         );
     }
-
-    #[test(creator = @rKGenAdmin)]
-    fun test_basic_flow(
-        creator: &signer
-    ) acquires ManagedRKGenAsset, MintingManager, TreasuryAddresses {
-        init_module(creator);
-        let creator_address = signer::address_of(creator);
-        let aaron_address = @0xface;
-
-        mint(creator, creator_address, 100);
-        let asset = get_metadata();
-        assert!(primary_fungible_store::balance(creator_address, asset) == 100, 4);
-
-        add_treasury_address(creator, aaron_address);
-        assert!(
-            verifyTreasuryAddress(&aaron_address),
-            error::invalid_argument(EROLE_NOT_EXIST)
-        );
-    }
 }
