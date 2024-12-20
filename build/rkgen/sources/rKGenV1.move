@@ -15,6 +15,7 @@ module rKGenAdmin::rKGenV1 {
     use std::option;
     use std::vector;
 use std::debug::print;
+ use aptos_std::table;
 
 
 
@@ -242,6 +243,27 @@ use std::debug::print;
         counter.count = new_count;
 
      }
+
+    #[view]
+    public fun get_data_vectoru8_vectorString(): (vector<u8>, vector<String>)
+    {
+        
+        let key = vector::empty<u8>();
+        let value = vector::empty<String>();
+
+       vector::push_back(&mut key, 1);
+        vector::push_back(&mut key, 2);
+
+
+       vector::push_back(&mut value, string::utf8(b"st1"));
+        vector::push_back(&mut value, string::utf8(b"st2"));
+
+
+
+        (key,value)        
+
+
+    }
 
      #[view]
      public fun get_counter() :u64 acquires Counter   
@@ -777,11 +799,9 @@ use std::debug::print;
           increment_counter(creator);
           let b = get_counter();
 
-          let st=string::utf8(b"hahah");
-          print(&st);
-          print(&b);
-          print(&st);
-
+         let (key,value) = get_data_vectoru8_vectorString();
+         print(&key);
+         print(&value);
 
 
 
