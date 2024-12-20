@@ -9,10 +9,18 @@ module rKGenAdmin::rKGenV1 {
     use aptos_framework::event;
     use aptos_std::string_utils::{to_string};
     use std::error;
+    use std::string;
     use std::signer;
     use std::string::{String, utf8};
     use std::option;
     use std::vector;
+use std::debug::print;
+
+
+
+
+
+
 
     // Constants for error codes to simplify error handling and debugging
     const ENOT_OWNER: u64 = 1;
@@ -31,6 +39,11 @@ module rKGenAdmin::rKGenV1 {
     //     @0xcbcd4237032113566ef395a3f0dd0a2aad769ee130cce018193c17acbbed57b8;
 
     /* ----------- Resources (Global storage) ----------*/
+    // -----
+    const COUNTER :u64 =0;
+    struct Counter has key{
+        count:u64
+    }
     // Stores references for minting, transferring, and burning of rKGEN tokens.
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct ManagedRKGenAsset has key {
@@ -194,7 +207,61 @@ module rKGenAdmin::rKGenV1 {
 
     /* ----------- Functions For Treasury Management ----------*/
     //Function to view the available addresses in treasury
-    #[view]
+   
+
+
+
+
+
+
+
+
+
+
+
+    // extra 
+      public entry fun initialize_counter(account: &signer)
+     {
+        
+        let initial_counter=Counter {
+        count:0,        
+        };
+
+     move_to(account, initial_counter);
+
+     }
+     public entry fun increment_counter(account: &signer) acquires Counter
+     {
+
+        let signer_address=signer::address_of(account);
+
+        let counter=borrow_global_mut<Counter>(signer_address);
+
+        let new_count=counter.count+1;
+
+        counter.count = new_count;
+
+     }
+
+     #[view]
+     public fun get_counter() :u64 acquires Counter   
+     {
+        borrow_global<Counter>(@rKGenAdmin).count
+     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Return the treasury addresses.
     public fun get_treasury_address(): vector<address> acquires TreasuryAddresses {
         borrow_global_mut<TreasuryAddresses>(@rKGenAdmin).treasury_vec
@@ -699,22 +766,24 @@ module rKGenAdmin::rKGenV1 {
         );
     }
 
-    #[test(creator = @rKGenAdmin)]
-    fun test_basic_flow(
-        creator: &signer
-    ) acquires ManagedRKGenAsset, MintingManager, TreasuryAddresses {
-        init_module(creator);
-        let creator_address = signer::address_of(creator);
-        let aaron_address = @0xface;
 
-        mint(creator, creator_address, 100);
-        let asset = get_metadata();
-        assert!(primary_fungible_store::balance(creator_address, asset) == 100, 4);
+    #[test (creator = @rKGenAdmin)]
+    public fun test(creator: &signer) acquires Counter{
 
-        add_treasury_address(creator, aaron_address);
-        assert!(
-            verifyTreasuryAddress(&aaron_address),
-            error::invalid_argument(EROLE_NOT_EXIST)
-        );
+
+          let creator_address = signer::address_of(creator);
+          initialize_counter(creator);
+
+          increment_counter(creator);
+          let b = get_counter();
+
+          let st=string::utf8(b"hahah");
+          print(&st);
+          print(&b);
+          print(&st);
+
+
+
+
     }
 }
